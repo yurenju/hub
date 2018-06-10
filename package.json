@@ -1,0 +1,29 @@
+{
+  "name": "hub-contracts",
+  "version": "0.1.0",
+  "description": "",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "truffle test",
+    "coverage": "solidity-coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yurenju/hub-contracts.git"
+  },
+  "author": "Yuren Ju <yurenju@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yurenju/hub-contracts/issues"
+  },
+  "homepage": "https://github.com/yurenju/hub-contracts#readme",
+  "dependencies": {
+    "chai-as-promised": "^7.1.1",
+    "solidity-coverage": "^0.5.4",
+    "truffle": "^4.1.11",
+    "truffle-core": "^4.1.11"
+  }
+}
