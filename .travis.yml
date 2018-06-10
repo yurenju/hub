@@ -1,0 +1,8 @@
+language: node_js
+
+env:
+  - CI_TASK=lint
+  - CI_TASK=test
+
+script:
+  - npm run $CI_TASK
