@@ -1,8 +1,15 @@
 const path = require('path');
 const fs = require('fs');
 const solc = require('solc');
+const shell = require('shelljs');
 
-const hubPath = path.resolve(__dirname, '..', 'contracts', 'Hub.sol');
-const source = fs.readFileSync(hubPath, 'utf8');
+const dirPath = path.resolve(__dirname, '..', 'contracts');
+const contracts = shell.ls(dirPath);
+const sources = {};
 
-module.exports = solc.compile(source, 1).contracts[':Hub'];
+contracts.forEach(contractName => {
+  const contractPath = path.resolve(dirPath, contractName);
+  sources[contractName] = fs.readFileSync(contractPath, 'utf8');
+});
+
+module.exports = solc.compile({ sources }, 1).contracts;
