@@ -19,8 +19,12 @@ Given('ticket sale contract is deployed', async function() {
     .send({ from: this.admin, gas: DEFAULT_GAS });
 });
 
-Given('set ticket sales price to {float} ETH', async function(float) {
-  return this.ticketSale.methods.setPrice(`${float}`).send({ from: this.admin, gas: DEFAULT_GAS });
+Given('{string} set ticket sales price to {float} ETH', async function(role, price) {
+  try {
+    await this.ticketSale.methods.setPrice(`${price}`).send({ from: this[role], gas: DEFAULT_GAS });
+  } catch (err) {
+    this.err = err;
+  }
 });
 
 When('user buy a ticket for {float} ETH', async function(price) {
@@ -37,8 +41,12 @@ Then('user can buy a ticket', async function() {
   expect(err).to.be.null;
 });
 
-Given('set ticket limit to {int}', async function(int) {
-  return this.ticketSale.methods.setLimit('3').send({ from: this.admin, gas: DEFAULT_GAS });
+Given('{string} set ticket limit to {int}', async function(role, limit) {
+  try {
+    await this.ticketSale.methods.setLimit(`${limit}`).send({ from: this[role], gas: DEFAULT_GAS });
+  } catch (err) {
+    this.err = err;
+  }
 });
 
 When('user buy {int} tickets for {float} ETH', async function(num, total) {
@@ -62,4 +70,12 @@ Then('user received a {float} ETH refund', async function(refund) {
   const balance = await web3.eth.getBalance(this.user);
   const now = web3.utils.fromWei(balance, 'ether');
   expect(now - prev).to.equal(refund);
+});
+
+Then('user cannot set ticket limit', function() {
+  expect(this.err).to.be.an('error');
+});
+
+Then('user cannot set ticket price', function() {
+  expect(this.err).to.be.an('error');
 });
