@@ -2,7 +2,7 @@ Feature: Ticket Sales
 
   Scenario Outline: Same as fare
     Given ticket sale contract is deployed
-    And admin set ticket sales price to <price> ETH
+    And "admin" set ticket sales price to <price> ETH
     When user buy a ticket for <price> ETH
     Then user can buy a ticket
 

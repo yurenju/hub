@@ -1,5 +1,4 @@
 const { Given, When, Then } = require('cucumber');
-const assert = require('assert');
 const { expect } = require('chai');
 const ganache = require('ganache-cli');
 const Web3 = require('web3');
@@ -49,20 +48,8 @@ Given('{string} set ticket limit to {int}', async function(role, limit) {
   }
 });
 
-When('user buy {int} tickets for {float} ETH', async function(num, total) {
-  return this.ticketSale.methods
-    .buy(`${num}`)
-    .send({ from: this.user, gas: DEFAULT_GAS, value: web3.utils.toWei(`${total}`, 'ether') });
-});
-
 Then('user cannot buy a ticket', async function() {
   expect(this.err).to.be.an('error');
-});
-
-When('user buy a ticket for {float} ETH', async function(price) {
-  return this.ticketSale.methods
-    .buy('1')
-    .send({ from: this.user, gas: DEFAULT_GAS, value: web3.utils.toWei(`${price}`, 'ether') });
 });
 
 Then('user received a {float} ETH refund', async function(refund) {
