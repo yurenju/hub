@@ -17,18 +17,6 @@ function generateID() {
   );
 }
 
-Given('hub contract is deployed', async function() {
-  this.accounts = await web3.eth.getAccounts();
-  this.admin = this.accounts[0];
-  this.host = this.accounts[1];
-  this.user = this.accounts[2];
-  this.userBalance = await web3.eth.getBalance(this.user);
-  const { interface, bytecode } = contracts['Hub.sol:Hub'];
-  this.hub = await new web3.eth.Contract(JSON.parse(interface))
-    .deploy({ data: bytecode })
-    .send({ from: this.admin, gas: DEFAULT_GAS });
-});
-
 Given('{string} set ticket sales fee to {float}%', async function(role, fee) {
   try {
     await this.hub.methods.setFee(`${fee}`).send({ from: this[role], ges: DEFAULT_GAS });
