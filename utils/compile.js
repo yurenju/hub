@@ -4,7 +4,7 @@ const solc = require('solc');
 const shell = require('shelljs');
 
 const dirPath = path.resolve(__dirname, '..', 'contracts');
-const contracts = shell.ls(dirPath);
+const contracts = shell.ls(path.join(dirPath, '*.sol'));
 const sources = {};
 
 contracts.forEach(contractName => {
