@@ -36,6 +36,7 @@ When('{string} create an event with ticket price {float} ETH', async function(ro
 });
 
 Then('service fee per ticket is {float} ETH', async function(fee) {
-  const balance = await web3.eth.getBalance(this.contractAddr);
+  await this.ticketSale.methods.withdrawFee().send({ from: this.admin, gas: DEFAULT_GAS });
+  const balance = await web3.eth.getBalance(this.hub._address);
   expect(balance).equal(fee);
 });

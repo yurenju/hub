@@ -3,11 +3,12 @@ const { expect } = require('chai');
 
 const { DEFAULT_GAS } = require('../support/helpers.js');
 
-When('admin set the ticket as used', async function() {
+When('{string} set the ticket as used', async function(role) {
   this.ticketId = await this.ticketSale.tickets().call();
-  return this.ticketSale.methods
-    .setUsedTickets([this.ticketId])
-    .send({ from: this.host, gas: DEFAULT_GAS });
+  return this.ticketSale.methods.setUsedTickets([this.ticketId]).send({
+    from: this[role],
+    gas: DEFAULT_GAS
+  });
 });
 
 Then('the ticket is not marked as used', async function() {

@@ -30,16 +30,16 @@ Given('ticket sale contract is deployed', async function() {
     .send({ from: this.host, gas: DEFAULT_GAS });
 });
 
-When('user buy {int} tickets for {float} ETH', async function(num, total) {
+When('{string} buy {int} tickets for {float} ETH', async function(role, num, total) {
   return this.ticketSale.methods
     .register(`${num}`)
-    .send({ from: this.user, gas: DEFAULT_GAS, value: web3.utils.toWei(`${total}`, 'ether') });
+    .send({ from: this[role], gas: DEFAULT_GAS, value: web3.utils.toWei(`${total}`, 'ether') });
 });
 
-When('user buy a ticket for {float} ETH', async function(price) {
+When('{string} buy a ticket for {float} ETH', async function(role, price) {
   return this.ticketSale.methods
     .register('1')
-    .send({ from: this.user, gas: DEFAULT_GAS, value: web3.utils.toWei(`${price}`, 'ether') });
+    .send({ from: this[role], gas: DEFAULT_GAS, value: web3.utils.toWei(`${price}`, 'ether') });
 });
 
 Given('{string} set ticket sales price to {float} ETH', async function(role, price) {

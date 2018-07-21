@@ -19,22 +19,22 @@ Given('{string} set ticket limit to {int}', async function(role, limit) {
   }
 });
 
-Then('user owns {int} tickets', async function(num) {
-  const actual = await this.ticketSale.methods.balanceOf(this.user).call();
+Then('{string} owns {int} tickets', async function(role, num) {
+  const actual = await this.ticketSale.methods.balanceOf(this[role]).call();
   expect(actual).equal(num);
 });
 
-Then('user received a {float} ETH refund', async function(refund) {
+Then('{string} received a {float} ETH refund', async function(role, refund) {
   const prev = web3.utils.fromWei(this.userBalance, 'ether');
-  const balance = await web3.eth.getBalance(this.user);
+  const balance = await web3.eth.getBalance(this[role]);
   const now = web3.utils.fromWei(balance, 'ether');
   expect(now - prev).to.equal(refund);
 });
 
-Then('user cannot set ticket limit', function() {
+Then('{string} cannot set ticket limit', function(role) {
   expect(this.err).to.be.an('error');
 });
 
-Then('user cannot set ticket price', function() {
+Then('{string} cannot set ticket price', function(role) {
   expect(this.err).to.be.an('error');
 });
