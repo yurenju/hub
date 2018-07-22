@@ -54,3 +54,12 @@ Feature: Ticket Sales
     When "user" buy a ticket for 2.0 ETH
     Then "user" owns 1 tickets
     And "user" received a 0.5 ETH refund
+
+Scenario: Set max attendees
+  Given ticket sale contract is deployed
+  And "host" set ticket sales price to 1.0 ETH
+  And "host" set max attendees to 1
+  When "user" buy a ticket for 1.0 ETH
+  And "user2" buy a ticket for 1.0 ETH
+  Then "user" owns 1 tickets
+  And "user2" owns 0 tickets

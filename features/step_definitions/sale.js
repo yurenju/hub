@@ -38,3 +38,7 @@ Then('{string} cannot set ticket limit', function(role) {
 Then('{string} cannot set ticket price', function(role) {
   expect(this.err).to.be.an('error');
 });
+
+Given('{string} set max attendees to {int}', function(role, max) {
+  return this.ticketSale.methods.setMaxAttendees(max).send({ from: this[role], gas: DEFAULT_GAS });
+});
