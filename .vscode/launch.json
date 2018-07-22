@@ -7,6 +7,15 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "truffle test",
+      "program": "${workspaceFolder}/node_modules/.bin/truffle",
+      "args": [
+        "test"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Cucumber",
       "program": "${workspaceRoot}/node_modules/cucumber/bin/cucumber-js"
     }
