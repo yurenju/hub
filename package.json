@@ -7,6 +7,7 @@
   },
   "scripts": {
     "lint": "solium -d contracts",
+    "pretest": "truffle compile",
     "test": "cucumber-js"
   },
   "repository": {
@@ -24,6 +25,7 @@
     "cucumber": "^4.2.1",
     "dotenv": "^6.0.0",
     "ganache-cli": "^6.1.0",
+    "openzeppelin-solidity": "1.11.0",
     "shelljs": "^0.8.2",
     "solc": "^0.4.24",
     "solium": "^1.1.7",

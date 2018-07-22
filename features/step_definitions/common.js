@@ -3,7 +3,7 @@ const ganache = require('ganache-cli');
 const Web3 = require('web3');
 const web3 = new Web3(ganache.provider());
 
-const contracts = require('../../utils/compile');
+const contracts = require('../support/helpers.js').getContracts();
 const { DEFAULT_GAS } = require('../support/helpers.js');
 
 Given('hub contract is deployed', async function() {
@@ -13,8 +13,8 @@ Given('hub contract is deployed', async function() {
   this.user = this.accounts[2];
   this.user2 = this.accounts[3];
   this.userBalance = await web3.eth.getBalance(this.user);
-  const { interface, bytecode } = contracts['Hub.sol:Hub'];
-  this.hub = await new web3.eth.Contract(JSON.parse(interface))
+  const { abi, bytecode } = contracts['Hub'];
+  this.hub = await new web3.eth.Contract(abi)
     .deploy({ data: bytecode })
     .send({ from: this.admin, gas: DEFAULT_GAS });
 });
@@ -26,8 +26,8 @@ Given('ticket sale contract is deployed', async function() {
   this.user = this.accounts[2];
   this.user2 = this.accounts[3];
   this.userBalance = await web3.eth.getBalance(this.user);
-  const { interface, bytecode } = contracts['TicketSale.sol:TicketSale'];
-  this.ticketSale = await new web3.eth.Contract(JSON.parse(interface))
+  const { abi, bytecode } = contracts['TicketSale'];
+  this.ticketSale = await new web3.eth.Contract(abi)
     .deploy({ data: bytecode })
     .send({ from: this.host, gas: DEFAULT_GAS });
 });
