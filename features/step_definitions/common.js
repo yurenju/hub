@@ -11,6 +11,7 @@ Given('hub contract is deployed', async function() {
   this.admin = this.accounts[0];
   this.host = this.accounts[1];
   this.user = this.accounts[2];
+  this.user2 = this.accounts[3];
   this.userBalance = await web3.eth.getBalance(this.user);
   const { interface, bytecode } = contracts['Hub.sol:Hub'];
   this.hub = await new web3.eth.Contract(JSON.parse(interface))
@@ -23,6 +24,7 @@ Given('ticket sale contract is deployed', async function() {
   this.admin = this.accounts[0];
   this.host = this.accounts[1];
   this.user = this.accounts[2];
+  this.user2 = this.accounts[3];
   this.userBalance = await web3.eth.getBalance(this.user);
   const { interface, bytecode } = contracts['TicketSale.sol:TicketSale'];
   this.ticketSale = await new web3.eth.Contract(JSON.parse(interface))
