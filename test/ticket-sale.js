@@ -10,10 +10,14 @@ contract('TicketSale', function(accounts) {
   const user2 = accounts[3];
 
   it('should sell tickets', async function() {
-    const ticketSale = await TicketSale.new({ from: host });
+    const ticketSale = await TicketSale.new('Ticket Sale', { from: host });
+
+    const prevBalance = await ticketSale.balanceOf(user1);
+    expect(prevBalance.toNumber()).to.equal(0);
+
     await ticketSale.setPrice(DEFAULT_PRICE, { from: host });
     await ticketSale.register(1, { from: user1, value: DEFAULT_PRICE });
-    const num = await ticketSale.balanceOf().call({ from: user1 });
+    const num = await ticketSale.balanceOf(user1);
     expect(num.toNumber()).to.equal(1);
   });
 
