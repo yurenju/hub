@@ -22,18 +22,20 @@ contract('TicketSale', function(accounts) {
   });
 
   it('should not sell ticket with below fare', async function() {
-    const ticketSale = await TicketSale.new({ from: host });
+    const ticketSale = await TicketSale.new('Ticket Sale', { from: host });
     await ticketSale.setPrice(DEFAULT_PRICE, { from: host });
-    await ticketSale.register(1, { from: user1, value: DEFAULT_PRICE - 10 });
-    const num = await ticketSale.balanceOf().call({ from: user1 });
+    try {
+      await ticketSale.register(1, { from: user1, value: DEFAULT_PRICE - 10 });
+    } catch (err) {}
+    const num = await ticketSale.balanceOf(user1);
     expect(num.toNumber()).to.equal(0);
   });
 
   it('should refund with over fare', async function() {
-    const ticketSale = await TicketSale.new({ from: host });
+    const ticketSale = await TicketSale.new('Ticket Sale', { from: host });
     await ticketSale.setPrice(DEFAULT_PRICE, { from: host });
     await ticketSale.register(1, { from: user1, value: DEFAULT_PRICE + 100 });
-    const num = await ticketSale.balanceOf().call({ from: user1 });
+    const num = await ticketSale.balanceOf(user1);
     expect(num.toNumber()).to.equal(1);
     const balance = await web3.eth.getBalance(ticketSale);
     expect(balance.toNumber()).to.equal(DEFAULT_PRICE);
@@ -41,55 +43,71 @@ contract('TicketSale', function(accounts) {
 
   it('should sell multiple tickets for same user', async function() {
     const limit = 3;
-    const ticketSale = await TicketSale.new({ from: host });
+    const ticketSale = await TicketSale.new('Ticket Sale', { from: host });
     await ticketSale.setPrice(DEFAULT_PRICE, { from: host });
     await ticketSale.setLimit(limit, { from: host });
     await ticketSale.register(limit, { from: user1, value: DEFAULT_PRICE });
-    const num = await ticketSale.balanceOf().call({ from: user1 });
+    const num = await ticketSale.balanceOf(user1);
     expect(num.toNumber()).to.equal(limit);
   });
 
   it('should disallow to sell multiple tickets when reach limit', async function() {
     const limit = 3;
-    const ticketSale = await TicketSale.new({ from: host });
+    const ticketSale = await TicketSale.new('Ticket Sale', { from: host });
     await ticketSale.setPrice(DEFAULT_PRICE, { from: host });
     await ticketSale.setLimit(limit, { from: host });
-    await ticketSale.register(limit + 1, { from: user1, value: DEFAULT_PRICE });
-    const num = await ticketSale.balanceOf().call({ from: user1 });
+    try {
+      await ticketSale.register(limit + 1, { from: user1, value: DEFAULT_PRICE });
+    } catch (err) {}
+    const num = await ticketSale.balanceOf(user1);
     expect(num.toNumber()).to.equal(0);
   });
 
   it('should disallow user to set ticket limit', async function() {
-    const ticketSale = await TicketSale.new({ from: host });
+    const ticketSale = await TicketSale.new('Ticket Sale', { from: host });
     await ticketSale.setPrice(DEFAULT_PRICE, { from: host });
-    await ticketSale.setLimit(1, { from: host });
-    await ticketSale.setLimit(2, { from: user1 });
-    const limit = await ticketSale.limit.call({ from: host });
+
+    try {
+      await ticketSale.setLimit(1, { from: host });
+      await ticketSale.setLimit(2, { from: user1 });
+    } catch (err) {}
+
+    const limit = await ticketSale.limit();
     expect(limit.toNumber()).to.equal(1);
   });
 
   it('should disallow user to set ticket price', async function() {
-    const ticketSale = await TicketSale.new({ from: host });
-    await ticketSale.setPrice(DEFAULT_PRICE, { from: host });
-    await ticketSale.setPrice(200, { from: user1 });
+    const ticketSale = await TicketSale.new('Ticket Sale', { from: host });
+
+    try {
+      await ticketSale.setPrice(DEFAULT_PRICE, { from: host });
+      await ticketSale.setPrice(200, { from: user1 });
+    } catch (err) {}
+
     const price = await ticketSale.price.call({ from: host });
     expect(price.toNumber()).to.equal(DEFAULT_PRICE);
   });
 
   it('should not let user register when reach max attendees', async function() {
-    const ticketSale = await TicketSale.new({ from: host });
+    const ticketSale = await TicketSale.new('Ticket Sale', { from: host });
     await ticketSale.setPrice(DEFAULT_PRICE, { from: host });
     await ticketSale.setMaxAttendees(1, { from: host });
-    await ticketSale.register(1, { from: user1, value: DEFAULT_PRICE });
-    await ticketSale.register(1, { from: user2, value: DEFAULT_PRICE });
-    const user1Ticket = await ticketSale.balanceOf.call({ from: user1 });
-    const user2Ticket = await ticketSale.balanceOf.call({ from: user2 });
+
+    try {
+      await ticketSale.register(1, { from: user1, value: DEFAULT_PRICE });
+      await ticketSale.register(1, { from: user2, value: DEFAULT_PRICE });
+    } catch (err) {}
+
+    const user1Ticket = await ticketSale.balanceOf(user1);
+    const user2Ticket = await ticketSale.balanceOf(user2);
+    const attendees = await ticketSale.ticketId();
+    expect(attendees.toNumber()).to.equal(1);
     expect(user1Ticket.toNumber()).to.equal(1);
     expect(user2Ticket.toNumber()).to.equal(0);
   });
 
   it('should be able to mark ticket as used', async function() {
-    const ticketSale = await TicketSale.new({ from: host });
+    const ticketSale = await TicketSale.new('Ticket Sale', { from: host });
     await ticketSale.setPrice(DEFAULT_PRICE, { from: host });
     await ticketSale.register(1, { from: user1, value: DEFAULT_PRICE });
     const ticketId = await ticketSale.tickets.call();
@@ -99,7 +117,7 @@ contract('TicketSale', function(accounts) {
   });
 
   it('should trade ticket', async function() {
-    const ticketSale = await TicketSale.new({ from: host });
+    const ticketSale = await TicketSale.new('Ticket Sale', { from: host });
     await ticketSale.setTradeFee(50, { from: admin });
     await ticketSale.setPrice(DEFAULT_PRICE, { from: host });
     await ticketSale.register(1, { from: user1, value: DEFAULT_PRICE });
