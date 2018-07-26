@@ -20,13 +20,17 @@ contract TicketSale is ERC721Token {
     _;
   }
 
-
   function register(uint8 ticketAmount) external payable {
-    require(msg.value * ticketAmount >= price && balanceOf(msg.sender) + ticketAmount <= limit && ticketId < maxAttendees);
+    require(msg.value >= price * ticketAmount && balanceOf(msg.sender) + ticketAmount <= limit && ticketId < maxAttendees);
 
     for (uint index = 0; index < ticketAmount; index++) {
       ticketId++;
       _mint(msg.sender, ticketId);
+    }
+
+    uint256 rest = msg.value - (ticketAmount * price);
+    if (rest > 0) {
+      msg.sender.transfer(rest);
     }
   }
 
@@ -42,4 +46,3 @@ contract TicketSale is ERC721Token {
     price = _price;
   }
 }
-

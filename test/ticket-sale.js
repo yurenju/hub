@@ -37,7 +37,7 @@ contract('TicketSale', function(accounts) {
     await ticketSale.register(1, { from: user1, value: DEFAULT_PRICE + 100 });
     const num = await ticketSale.balanceOf(user1);
     expect(num.toNumber()).to.equal(1);
-    const balance = await web3.eth.getBalance(ticketSale);
+    const balance = await web3.eth.getBalance(ticketSale.address);
     expect(balance.toNumber()).to.equal(DEFAULT_PRICE);
   });
 
@@ -46,7 +46,8 @@ contract('TicketSale', function(accounts) {
     const ticketSale = await TicketSale.new('Ticket Sale', { from: host });
     await ticketSale.setPrice(DEFAULT_PRICE, { from: host });
     await ticketSale.setLimit(limit, { from: host });
-    await ticketSale.register(limit, { from: user1, value: DEFAULT_PRICE });
+
+    await ticketSale.register(limit, { from: user1, value: DEFAULT_PRICE * 3 });
     const num = await ticketSale.balanceOf(user1);
     expect(num.toNumber()).to.equal(limit);
   });
