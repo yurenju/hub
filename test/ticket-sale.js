@@ -85,7 +85,7 @@ contract('TicketSale', function(accounts) {
       await ticketSale.setPrice(200, { from: user1 });
     } catch (err) {}
 
-    const price = await ticketSale.price.call({ from: host });
+    const price = await ticketSale.price({ from: host });
     expect(price.toNumber()).to.equal(DEFAULT_PRICE);
   });
 
@@ -101,7 +101,7 @@ contract('TicketSale', function(accounts) {
 
     const user1Ticket = await ticketSale.balanceOf(user1);
     const user2Ticket = await ticketSale.balanceOf(user2);
-    const attendees = await ticketSale.ticketId();
+    const attendees = await ticketSale.tickets();
     expect(attendees.toNumber()).to.equal(1);
     expect(user1Ticket.toNumber()).to.equal(1);
     expect(user2Ticket.toNumber()).to.equal(0);
@@ -111,23 +111,27 @@ contract('TicketSale', function(accounts) {
     const ticketSale = await TicketSale.new('Ticket Sale', { from: host });
     await ticketSale.setPrice(DEFAULT_PRICE, { from: host });
     await ticketSale.register(1, { from: user1, value: DEFAULT_PRICE });
-    const ticketId = await ticketSale.tickets.call();
+    const ticketId = await ticketSale.tickets();
     await ticketSale.setUsedTickets([ticketId], { from: host });
-    const used = await ticketSale.isUsedTicket.call(ticketId);
+    const used = await ticketSale.isUsedTicket(ticketId);
     expect(used).to.be.true;
   });
 
   it('should trade ticket', async function() {
     const ticketSale = await TicketSale.new('Ticket Sale', { from: host });
-    await ticketSale.setTradeFee(50, { from: admin });
+    await ticketSale.setTradeFee(500, { from: host });
     await ticketSale.setPrice(DEFAULT_PRICE, { from: host });
     await ticketSale.register(1, { from: user1, value: DEFAULT_PRICE });
-    const ticketId = await ticketSale.tickets.call();
+    const ticketId = await ticketSale.tickets();
     await ticketSale.requestTrading(ticketId, DEFAULT_PRICE + 100, { from: user1 });
-    await ticketSale.trade(ticket, { from: user2, value: DEFAULT_PRICE + 100 });
+    await ticketSale.trade(1, { from: user2, value: DEFAULT_PRICE + 100 });
     const balance1 = await ticketSale.balanceOf(user1);
     const balance2 = await ticketSale.balanceOf(user2);
-    expect(balance1).to.equal(0);
-    expect(balance2).to.equal(1);
+    expect(balance1.toNumber()).to.equal(0);
+    expect(balance2.toNumber()).to.equal(1);
   });
+
+  it('should trade the ticket which only request for trading');
+  it('should cancel ticket trading');
+  it('should not trade non-exist trade id');
 });
