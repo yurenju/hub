@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 
 const TicketSale = artifacts.require('TicketSale');
-const DEFAULT_PRICE = 100;
+const { DEFAULT_PRICE } = require('./helpers');
 
 contract('TicketSale', function(accounts) {
   const admin = accounts[0];
@@ -10,7 +10,7 @@ contract('TicketSale', function(accounts) {
   const user2 = accounts[3];
 
   it('should sell tickets', async function() {
-    const ticketSale = await TicketSale.new('Ticket Sale', { from: host });
+    const ticketSale = await TicketSale.new('Ticket Sale', 0, 0, { from: host });
 
     const prevBalance = await ticketSale.balanceOf(user1);
     expect(prevBalance.toNumber()).to.equal(0);
@@ -22,7 +22,7 @@ contract('TicketSale', function(accounts) {
   });
 
   it('should not sell ticket with below fare', async function() {
-    const ticketSale = await TicketSale.new('Ticket Sale', { from: host });
+    const ticketSale = await TicketSale.new('Ticket Sale', 0, 0, { from: host });
     await ticketSale.setPrice(DEFAULT_PRICE, { from: host });
     try {
       await ticketSale.register(1, { from: user1, value: DEFAULT_PRICE - 10 });
@@ -32,7 +32,7 @@ contract('TicketSale', function(accounts) {
   });
 
   it('should refund with over fare', async function() {
-    const ticketSale = await TicketSale.new('Ticket Sale', { from: host });
+    const ticketSale = await TicketSale.new('Ticket Sale', 0, 0, { from: host });
     await ticketSale.setPrice(DEFAULT_PRICE, { from: host });
     await ticketSale.register(1, { from: user1, value: DEFAULT_PRICE + 100 });
     const num = await ticketSale.balanceOf(user1);
@@ -43,7 +43,7 @@ contract('TicketSale', function(accounts) {
 
   it('should sell multiple tickets for same user', async function() {
     const limit = 3;
-    const ticketSale = await TicketSale.new('Ticket Sale', { from: host });
+    const ticketSale = await TicketSale.new('Ticket Sale', 0, 0, { from: host });
     await ticketSale.setPrice(DEFAULT_PRICE, { from: host });
     await ticketSale.setLimit(limit, { from: host });
 
@@ -54,7 +54,7 @@ contract('TicketSale', function(accounts) {
 
   it('should disallow to sell multiple tickets when reach limit', async function() {
     const limit = 3;
-    const ticketSale = await TicketSale.new('Ticket Sale', { from: host });
+    const ticketSale = await TicketSale.new('Ticket Sale', 0, 0, { from: host });
     await ticketSale.setPrice(DEFAULT_PRICE, { from: host });
     await ticketSale.setLimit(limit, { from: host });
     try {
@@ -65,7 +65,7 @@ contract('TicketSale', function(accounts) {
   });
 
   it('should disallow user to set ticket limit', async function() {
-    const ticketSale = await TicketSale.new('Ticket Sale', { from: host });
+    const ticketSale = await TicketSale.new('Ticket Sale', 0, 0, { from: host });
     await ticketSale.setPrice(DEFAULT_PRICE, { from: host });
 
     try {
@@ -78,7 +78,7 @@ contract('TicketSale', function(accounts) {
   });
 
   it('should disallow user to set ticket price', async function() {
-    const ticketSale = await TicketSale.new('Ticket Sale', { from: host });
+    const ticketSale = await TicketSale.new('Ticket Sale', 0, 0, { from: host });
 
     try {
       await ticketSale.setPrice(DEFAULT_PRICE, { from: host });
@@ -90,7 +90,7 @@ contract('TicketSale', function(accounts) {
   });
 
   it('should not let user register when reach max attendees', async function() {
-    const ticketSale = await TicketSale.new('Ticket Sale', { from: host });
+    const ticketSale = await TicketSale.new('Ticket Sale', 0, 0, { from: host });
     await ticketSale.setPrice(DEFAULT_PRICE, { from: host });
     await ticketSale.setMaxAttendees(1, { from: host });
 
@@ -108,17 +108,17 @@ contract('TicketSale', function(accounts) {
   });
 
   it('should be able to mark ticket as used', async function() {
-    const ticketSale = await TicketSale.new('Ticket Sale', { from: host });
+    const ticketSale = await TicketSale.new('Ticket Sale', 0, 0, { from: host });
     await ticketSale.setPrice(DEFAULT_PRICE, { from: host });
     await ticketSale.register(1, { from: user1, value: DEFAULT_PRICE });
     const ticketId = await ticketSale.tickets();
-    await ticketSale.setUsedTickets([ticketId], { from: host });
+    await ticketSale.setUsedTickets([ticketId.toNumber()], { from: host });
     const used = await ticketSale.isUsedTicket(ticketId);
     expect(used).to.be.true;
   });
 
   it('should trade ticket', async function() {
-    const ticketSale = await TicketSale.new('Ticket Sale', { from: host });
+    const ticketSale = await TicketSale.new('Ticket Sale', 0, 0, { from: host });
     await ticketSale.setTradeFee(500, { from: host });
     await ticketSale.setPrice(DEFAULT_PRICE, { from: host });
     await ticketSale.register(1, { from: user1, value: DEFAULT_PRICE });
@@ -134,4 +134,6 @@ contract('TicketSale', function(accounts) {
   it('should trade the ticket which only request for trading');
   it('should cancel ticket trading');
   it('should not trade non-exist trade id');
+  it('only set their own ticket as marked');
+  it('cannot register after due date');
 });
