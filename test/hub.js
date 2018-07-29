@@ -14,7 +14,7 @@ contract('Hub', function(accounts) {
     const fee = Number.parseInt((DEFAULT_PRICE * ratio) / 10000, 10);
     const hub = await Hub.new({ from: admin });
     await hub.setFeeRatio(ratio, { from: admin });
-    await hub.createEvent('ticket sale', { from: host });
+    await hub.createEvent('ticket sale', 0, 0, { from: host });
     const eventId = await hub.events();
     const eventAddress = await hub.eventList(eventId);
     const ticketSale = await TicketSale.at(eventAddress);

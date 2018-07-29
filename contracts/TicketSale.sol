@@ -8,7 +8,7 @@ contract TicketSale is ERC721Token {
   mapping(address => bool) hosts;
   uint256 public tradings = 0;
   mapping(uint256 => Trade) tradingList;
-  mapping(address => uint256) tradingTicketsOfOwner;
+  mapping(address => uint256) public tradingTicketsOfOwner;
   mapping(uint256 => bool) usedTickets;
 
   uint256 public tickets = 0;
@@ -17,6 +17,9 @@ contract TicketSale is ERC721Token {
   uint256 public maxAttendees = 10;
   uint16 public tradeFee = 0;
   uint8 public maxMarkedTickets = 10;
+
+  uint256 startTime;
+  uint256 dueTime;
 
   // serviceFeeRatio / 10000 = ratio
   uint16 public serviceFeeRatio = 100;
@@ -28,12 +31,14 @@ contract TicketSale is ERC721Token {
     uint256 value;
   }
 
-  constructor (string name, address hubAddr, uint16 ratio) public
+  constructor (string name, address hubAddr, uint16 ratio, uint256 _startTime, uint256 _dueTime) public
       ERC721Token(name, name)
   {
     hub = Hub(hubAddr);
     hosts[msg.sender] = true;
     serviceFeeRatio = ratio;
+    startTime = _startTime;
+    dueTime = _dueTime;
   }
 
   modifier onlyHost() {
@@ -43,6 +48,13 @@ contract TicketSale is ERC721Token {
 
   function register(uint8 ticketAmount) external payable {
     require(msg.value >= price * ticketAmount && balanceOf(msg.sender) + ticketAmount <= limit && tickets < maxAttendees);
+
+    if (startTime != 0) {
+      require(now >= startTime);
+    }
+    if (dueTime != 0) {
+      require(now <= dueTime);
+    }
 
     serviceFee += msg.value * serviceFeeRatio / 10000;
     for (uint index = 0; index < ticketAmount; index++) {
