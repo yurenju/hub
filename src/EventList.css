@@ -1,0 +1,36 @@
+.event {
+  height: 200px;
+  color: white;
+  position: relative;
+}
+
+.event > div {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    color: black;
+    height: 50px;
+    line-height: 50px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.type-tech {
+  background-image: url("./type-tech.jpg");
+  background-size: cover;
+  background-position: bottom;
+}
+
+.type-business {
+  background-image: url("./type-business.jpg");
+  background-size: cover;
+  background-position: bottom;
+}
+
+.type-music {
+  background-image: url("./type-music.jpg");
+  background-size: cover;
+  background-position: top;
+}

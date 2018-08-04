@@ -1,25 +1,16 @@
 {
-  "name": "hub-contracts",
+  "name": "hub",
   "version": "0.1.0",
-  "description": "",
-  "directories": {
-    "test": "test"
-  },
-  "scripts": {
-    "lint": "solium -d contracts",
-    "test": "truffle test"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/yurenju/hub-contracts.git"
-  },
-  "author": "Yuren Ju <yurenju@gmail.com>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/yurenju/hub-contracts/issues"
-  },
-  "homepage": "https://github.com/yurenju/hub-contracts#readme",
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.0-14",
+    "@fortawesome/free-regular-svg-icons": "^5.1.0-11",
+    "@fortawesome/free-solid-svg-icons": "^5.1.0-11",
+    "@fortawesome/react-fontawesome": "^0.1.0-11",
+    "bootstrap": "^4.1.3",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1",
+    "react-router-dom": "^4.3.1",
+    "react-scripts": "1.1.4",
     "chai": "^4.1.2",
     "dotenv": "^6.0.0",
     "ganache-cli": "^6.1.0",
@@ -28,7 +19,17 @@
     "solc": "^0.4.24",
     "solium": "^1.1.7",
     "truffle": "^4.1.13",
-    "truffle-hdwallet-provider": "0.0.5",
+    "truffle-hdwallet-provider": "0.0.6",
     "web3": "^1.0.0-beta.34"
-  }
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "contract:lint": "solium -d ethereum/contracts",
+    "contract:test": "cd ethereum && truffle test"
+  },
+  "author": "Yuren Ju <yurenju@gmail.com>",
+  "license": "MIT"
 }

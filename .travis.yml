@@ -1,8 +1,8 @@
 language: node_js
 
 env:
-  - CI_TASK=lint
-  - CI_TASK=test
+  - CI_TASK=contract:lint
+  - CI_TASK=contract:test
 
 script:
   - npm run $CI_TASK
