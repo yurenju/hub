@@ -1,14 +1,30 @@
 import React, { Component } from 'react';
 
+import { getAccounts, hub } from './Contracts.js';
+
 class CreateEvent extends Component {
   constructor() {
     super();
   }
 
+  onSubmit = async e => {
+    e.preventDefault();
+    const accounts = await getAccounts();
+    if (accounts.length === 0) {
+      return;
+    }
+
+    const startDate = Number.parseInt(Date.now() / 1000, 10);
+    const dueDate = startDate + 24 * 60 * 60;
+    await hub.methods.createEvent('Test', startDate, dueDate).send({
+      from: accounts[0]
+    });
+  };
+
   render() {
     return (
       <div className="container mt-4">
-        <form>
+        <form onSubmit={this.onSubmit}>
           <div className="form-group">
             <label htmlFor="event-title">Title</label>
             <input

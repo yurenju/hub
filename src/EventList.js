@@ -1,26 +1,40 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 
+import { getAccounts, hub, TicketSale } from './Contracts.js';
 import './EventList.css';
 
 class EventList extends Component {
   constructor() {
     super();
-    this.events = [
-      { id: '1', type: 'tech', title: 'Taipei Ethereum Meetup #1', date: '2018-08-15' },
-      {
-        id: '2',
-        type: 'business',
-        title: 'Coffee Chats in Taipei - Friday 24 August',
-        date: '2018-08-20'
-      },
-      { id: '3', type: 'music', title: '貝登武藤堡爵士樂演奏會', date: '2018-08-25' },
-      { id: '4', type: 'tech', title: 'Taipei Ethereum Meetup #2', date: '2018-08-30' }
-    ];
+    this.types = ['type', 'business', 'music'];
+    this.state = {
+      events: []
+    };
+  }
+
+  async componentDidMount() {
+    const accounts = await getAccounts();
+    const countStr = await hub.methods.events().call();
+    const count = Number.parseInt(countStr, 10);
+
+    const events = [];
+    for (let i = 1; i <= count; i++) {
+      const addr = await hub.methods.eventList(`${i}`).call();
+      const event = new TicketSale(addr);
+      const title = await event.methods.name().call();
+      events.push({
+        id: addr,
+        title,
+        type: this.types[Number.parseInt(Math.random() * this.types.length)]
+      });
+    }
+
+    this.setState({ events });
   }
 
   renderEvents() {
-    return this.events.map((event, i) => <Event key={`${event.title}-${i}`} {...event} />);
+    return this.state.events.map((event, i) => <Event key={`${event.title}-${i}`} {...event} />);
   }
 
   render() {

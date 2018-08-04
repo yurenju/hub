@@ -28,7 +28,9 @@
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "contract:lint": "solium -d ethereum/contracts",
-    "contract:test": "cd ethereum && truffle test"
+    "contract:test": "cd ethereum && truffle test",
+    "contract:compile": "cd ethereum && truffle compile",
+    "postcontract:compile": "mkdir -p src/contracts && cp ethereum/build/contracts/*.json src/contracts"
   },
   "author": "Yuren Ju <yurenju@gmail.com>",
   "license": "MIT"
