@@ -5,11 +5,11 @@ import "./Hub.sol";
 
 contract TicketSale is ERC721Token {
   Hub hub;
-  mapping(address => bool) hosts;
+  mapping(address => bool) public hosts;
   uint256 public tradings = 0;
-  mapping(uint256 => Trade) tradingList;
+  mapping(uint256 => Trade) public tradingList;
   mapping(address => uint256) public tradingTicketsOfOwner;
-  mapping(uint256 => bool) usedTickets;
+  mapping(uint256 => bool) public usedTickets;
 
   uint256 public tickets = 0;
   uint256 public price;
@@ -18,8 +18,8 @@ contract TicketSale is ERC721Token {
   uint16 public tradeFee = 0;
   uint8 public maxMarkedTickets = 10;
 
-  uint256 startTime;
-  uint256 dueTime;
+  uint256 public startTime;
+  uint256 public dueTime;
 
   // serviceFeeRatio / 10000 = ratio
   uint16 public serviceFeeRatio = 100;
@@ -31,7 +31,7 @@ contract TicketSale is ERC721Token {
     uint256 value;
   }
 
-  constructor (string name, address hubAddr, uint16 ratio, uint256 _startTime, uint256 _dueTime) public
+  constructor (string name, address hubAddr, uint16 ratio, uint256 _startTime, uint256 _dueTime, uint256 _price) public
       ERC721Token(name, name)
   {
     hub = Hub(hubAddr);
@@ -39,6 +39,7 @@ contract TicketSale is ERC721Token {
     serviceFeeRatio = ratio;
     startTime = _startTime;
     dueTime = _dueTime;
+    price = _price;
   }
 
   modifier onlyHost() {
@@ -136,7 +137,7 @@ contract TicketSale is ERC721Token {
   function withdrawFee() external {
     require(address(hub) != address(0) && serviceFee > 0 && serviceFee <= address(this).balance);
 
-    hub.deposite.value(serviceFee)();
     serviceFee = 0;
+    hub.deposite.value(serviceFee)();
   }
 }

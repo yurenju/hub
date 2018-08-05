@@ -7,7 +7,7 @@ const web3js = new Web3(Web3.givenProvider);
 
 export const hub = new web3js.eth.Contract(
   HubContract.abi,
-  '0xad4776B1Ef2cBE2d539E049a19a2EacA221977aD'
+  '0xC7397F8641621Dacb50cd14EBA1f2B1Ff8F8978B'
 );
 
 export function TicketSale(address) {
@@ -16,4 +16,12 @@ export function TicketSale(address) {
 
 export function getAccounts() {
   return web3js.eth.getAccounts();
+}
+
+export function toWei(number, unit) {
+  return web3js.utils.toWei(number, unit);
+}
+
+export function fromWei(val, unit) {
+  return web3js.utils.fromWei(val, unit);
 }

@@ -7,7 +7,7 @@ import './EventList.css';
 class EventList extends Component {
   constructor() {
     super();
-    this.types = ['type', 'business', 'music'];
+    this.types = ['tech', 'business', 'music'];
     this.state = {
       events: []
     };

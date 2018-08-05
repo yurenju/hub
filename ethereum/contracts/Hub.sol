@@ -25,9 +25,9 @@ contract Hub {
     serviceFeeRatio = ratio;
   }
 
-  function createEvent(string name, uint256 startTime, uint256 dueTime) external {
+  function createEvent(string name, uint256 startTime, uint256 dueTime, uint256 price) external {
     events++;
-    TicketSale ts = new TicketSale(name, address(this), serviceFeeRatio, startTime, dueTime);
+    TicketSale ts = new TicketSale(name, address(this), serviceFeeRatio, startTime, dueTime, price);
     ts.setHost(msg.sender);
     eventList[events] = ts;
   }
