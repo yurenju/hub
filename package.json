@@ -12,6 +12,7 @@
     "ganache-cli": "^6.1.0",
     "moment": "^2.22.2",
     "openzeppelin-solidity": "1.11.0",
+    "qrcode": "^1.2.2",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "react-router-dom": "^4.3.1",

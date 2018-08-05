@@ -25,3 +25,11 @@ export function toWei(number, unit) {
 export function fromWei(val, unit) {
   return web3js.utils.fromWei(val, unit);
 }
+
+export function sign(message, account) {
+  return web3js.eth.sign(message, account);
+}
+
+export function recover(message, signature) {
+  return web3js.eth.accounts.recover(message, signature);
+}
