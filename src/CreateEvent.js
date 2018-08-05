@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import { getAccounts, hub } from './Contracts.js';
+import { getAccounts, hub } from './ethereum';
 
 class CreateEvent extends Component {
   constructor() {

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 
-import { getAccounts, hub, TicketSale } from './Contracts.js';
+import { getAccounts, hub, TicketSale } from './ethereum';
 import './EventList.css';
 
 class EventList extends Component {
