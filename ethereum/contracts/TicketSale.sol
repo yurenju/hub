@@ -131,13 +131,14 @@ contract TicketSale is ERC721Token {
   }
 
   function withdraw() external onlyHost {
+    // BUGGY HERE
     msg.sender.transfer(address(this).balance - serviceFee);
   }
 
   function withdrawFee() external {
     require(address(hub) != address(0) && serviceFee > 0 && serviceFee <= address(this).balance);
 
-    serviceFee = 0;
     hub.deposite.value(serviceFee)();
+    serviceFee = 0;
   }
 }

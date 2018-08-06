@@ -14,11 +14,10 @@ contract('Hub', function(accounts) {
     const fee = Number.parseInt((DEFAULT_PRICE * ratio) / 10000, 10);
     const hub = await Hub.new({ from: admin });
     await hub.setFeeRatio(ratio, { from: admin });
-    await hub.createEvent('ticket sale', 0, 0, { from: host });
+    await hub.createEvent('ticket sale', 0, 0, DEFAULT_PRICE, { from: host });
     const eventId = await hub.events();
     const eventAddress = await hub.eventList(eventId);
     const ticketSale = await TicketSale.at(eventAddress);
-    await ticketSale.setPrice(DEFAULT_PRICE, { from: host });
     await ticketSale.register(1, { from: user, value: DEFAULT_PRICE });
     await ticketSale.withdrawFee({ from: admin });
     const balance = await web3.eth.getBalance(hub.address);

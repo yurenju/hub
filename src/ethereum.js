@@ -27,9 +27,9 @@ export function fromWei(val, unit) {
 }
 
 export function sign(message, account) {
-  return web3js.eth.sign(message, account);
+  return web3js.eth.personal.sign(message, account);
 }
 
 export function recover(message, signature) {
-  return web3js.eth.accounts.recover(message, signature);
+  return web3js.eth.personal.ecRecover(message, signature);
 }

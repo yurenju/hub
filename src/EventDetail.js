@@ -5,7 +5,7 @@ import { faCalendarPlus, faCalendarMinus } from '@fortawesome/free-regular-svg-i
 import * as moment from 'moment';
 import QRCode from 'qrcode';
 
-import { getAccounts, TicketSale, toWei, fromWei, sign, recover } from './ethereum';
+import { getAccounts, TicketSale, toWei, fromWei, sign } from './ethereum';
 import imgTech from './type-tech.jpg';
 import imgBusiness from './type-business.jpg';
 import imgMusic from './type-music.jpg';
@@ -17,6 +17,7 @@ class EventDetail extends Component {
     this.state = {
       event: { price: 0 },
       tickets: [],
+      tradings: [],
       showQRCode: false
     };
   }
@@ -35,10 +36,20 @@ class EventDetail extends Component {
       const ticketId = await ticketSale.methods.tokenOfOwnerByIndex(accounts[0], i).call();
       tickets.push(ticketId);
     }
+
+    const tradingCount = await ticketSale.methods.tradings().call();
+    const tradings = [];
+    for (let i = 0; i < tradingCount; i++) {
+      const trade = await ticketSale.methods.tradingList(i + 1).call();
+      const { owner, ticketId, value } = trade;
+      tradings.push({ owner, ticketId, value });
+    }
+
     this.ticketSale = ticketSale;
     this.canvasRef = React.createRef();
     this.setState({
       tickets,
+      tradings,
       event: {
         title,
         startDate: Number.parseInt(startDate, 10) * 1000,
@@ -68,6 +79,21 @@ class EventDetail extends Component {
     this.setState({ showQRCode: !this.state.showQRCode });
   };
 
+  onTrade = async () => {
+    const accounts = await getAccounts();
+    const price = Number.parseFloat(fromWei(this.state.event.price, 'ether')) * 1.2;
+    const wei = toWei(`${price}`, 'ether');
+    await this.ticketSale.methods
+      .requestTrading(this.state.tickets[0], wei)
+      .send({ from: accounts[0] });
+  };
+
+  onBuy = async tradeId => {
+    const accounts = await getAccounts();
+    const price = this.state.tradings[tradeId - 1].value;
+    await this.ticketSale.methods.trade(tradeId).send({ from: accounts[0], value: price });
+  };
+
   renderCover() {
     if (this.state.event.type === 'tech') {
       return <img src={imgTech} />;
@@ -85,7 +111,7 @@ class EventDetail extends Component {
           <button type="button" className="btn btn-primary btn-lg" onClick={this.onQRCode}>
             QR Code
           </button>&nbsp;
-          <button type="button" className="btn btn-warning btn-lg">
+          <button type="button" className="btn btn-warning btn-lg" onClick={this.onTrade}>
             Trade
           </button>
         </div>
@@ -110,6 +136,31 @@ class EventDetail extends Component {
         <canvas width="500" height="500" style={{ display }} ref={this.canvasRef} />
       </div>
     );
+  }
+
+  renderTradings() {
+    if (this.state.tradings.length > 0) {
+      const tradings = this.state.tradings.map((t, i) => {
+        return (
+          <div key={t.ticketId} className="row">
+            <div className="col-4">Ticket #{t.ticketId}</div>
+            <div className="col-4">{fromWei(t.value, 'ether')} ETH</div>
+            <div className="col-4">
+              <button onClick={this.onBuy.bind(this, i + 1)} className="btn btn-primary">
+                buy
+              </button>
+            </div>
+          </div>
+        );
+      });
+      return (
+        <div>
+          <hr />
+          <h1>Ticket on sale</h1>
+          <div>{tradings}</div>
+        </div>
+      );
+    }
   }
 
   render() {
@@ -156,6 +207,7 @@ class EventDetail extends Component {
         </div>
         {this.renderCanvas()}
         {this.renderButtons()}
+        {this.renderTradings()}
       </div>
     );
   }
