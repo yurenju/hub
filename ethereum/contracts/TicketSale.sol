@@ -95,25 +95,25 @@ contract TicketSale is ERC721Token {
     tradingTicketsOfOwner[msg.sender]++;
   }
 
-  function _cancelTrade(uint256 tradeId) internal {
-    require(tradingList[tradeId].ticketId != 0);
-
-    tradingTicketsOfOwner[msg.sender]--;
+  function _cancelTrade(uint256 tradeId, address owner) internal {
+    tradingTicketsOfOwner[owner]--;
     delete tradingList[tradeId];
     tradings--;
   }
 
   function cancelTrade(uint256 tradeId) external {
-    _cancelTrade(tradeId);
+    Trade memory t = tradingList[tradeId];
+    require(t.owner == msg.sender);
+    _cancelTrade(tradeId, msg.sender);
   }
 
-  function trade(uint256 tradeId) external payable {
+  function trade(uint256 tradeId) public payable {
     require(tradingList[tradeId].ticketId != 0);
 
     Trade memory t = tradingList[tradeId];
     require(t.value <= msg.value);
 
-    _cancelTrade(t.ticketId);
+    _cancelTrade(t.ticketId, t.owner);
     removeTokenFrom(t.owner, t.ticketId);
     addTokenTo(msg.sender, t.ticketId);
   }

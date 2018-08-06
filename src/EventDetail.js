@@ -15,6 +15,8 @@ class EventDetail extends Component {
   constructor() {
     super();
     this.state = {
+      registered: 0,
+      maxAttendees: 0,
       event: { price: 0 },
       tickets: [],
       tradings: [],
@@ -30,6 +32,8 @@ class EventDetail extends Component {
     const startDate = await ticketSale.methods.startTime().call();
     const dueDate = await ticketSale.methods.dueTime().call();
     const price = await ticketSale.methods.price().call();
+    const registered = Number.parseInt(await ticketSale.methods.tickets().call(), 10);
+    const maxAttendees = Number.parseInt(await ticketSale.methods.maxAttendees().call(), 10);
     const balance = Number.parseInt(await ticketSale.methods.balanceOf(accounts[0]).call(), 10);
     const tickets = [];
     for (let i = 0; i < balance; i++) {
@@ -37,7 +41,7 @@ class EventDetail extends Component {
       tickets.push(ticketId);
     }
 
-    const tradingCount = await ticketSale.methods.tradings().call();
+    const tradingCount = Number.parseInt(await ticketSale.methods.tradings().call(), 10);
     const tradings = [];
     for (let i = 0; i < tradingCount; i++) {
       const trade = await ticketSale.methods.tradingList(i + 1).call();
@@ -50,6 +54,8 @@ class EventDetail extends Component {
     this.setState({
       tickets,
       tradings,
+      registered,
+      maxAttendees,
       event: {
         title,
         startDate: Number.parseInt(startDate, 10) * 1000,
@@ -91,7 +97,7 @@ class EventDetail extends Component {
   onBuy = async tradeId => {
     const accounts = await getAccounts();
     const price = this.state.tradings[tradeId - 1].value;
-    await this.ticketSale.methods.trade(tradeId).send({ from: accounts[0], value: price });
+    await this.ticketSale.methods.trade(`${tradeId}`).send({ from: accounts[0], value: price });
   };
 
   renderCover() {
@@ -169,6 +175,19 @@ class EventDetail extends Component {
         {this.renderCover()}
         <h1>{this.state.event.title}</h1>
         <div className="information mx-3">
+          <div className="row">
+            <div className="col-1">
+              <FontAwesomeIcon icon={faCalendarPlus} />
+            </div>
+            <div className="col-11">
+              <strong>Ticket amount</strong>
+            </div>
+          </div>
+          <div className="row mb-2">
+            <div className="col-11 offset-1">{`${this.state.registered} / ${
+              this.state.maxAttendees
+            }`}</div>
+          </div>
           <div className="row">
             <div className="col-1">
               <FontAwesomeIcon icon={faCalendarPlus} />

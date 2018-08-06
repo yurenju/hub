@@ -8,6 +8,7 @@ contract('TicketSale', function(accounts) {
   const host = accounts[1];
   const user1 = accounts[2];
   const user2 = accounts[3];
+  const user3 = accounts[4];
 
   it('should sell tickets', async function() {
     const ticketSale = await TicketSale.new('Ticket Sale', 0, 0, 0, 0, DEFAULT_PRICE, {
@@ -181,5 +182,19 @@ contract('TicketSale', function(accounts) {
     await ticketSale.cancelTrade(1, { from: user1 });
     ticketCount = await ticketSale.tradingTicketsOfOwner(user1);
     expect(ticketCount.toNumber()).to.equal(0);
+  });
+
+  it('should trade ticket multiple times', async function() {
+    const ticketSale = await TicketSale.new('Ticket Sale', 0, 0, 0, 0, DEFAULT_PRICE, {
+      from: host
+    });
+    await ticketSale.setTradeFee(500, { from: host });
+    await ticketSale.register(1, { from: user1, value: DEFAULT_PRICE });
+    await ticketSale.register(1, { from: user2, value: DEFAULT_PRICE });
+    const ticketId = (await ticketSale.tickets()).toNumber();
+    await ticketSale.requestTrading(ticketId, DEFAULT_PRICE + 100, { from: user2 });
+    await ticketSale.trade(1, { from: user3, value: DEFAULT_PRICE + 100 });
+    const balance = await ticketSale.balanceOf(user3);
+    expect(balance.toNumber()).to.equal(1);
   });
 });
