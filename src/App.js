@@ -10,7 +10,7 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <Router>
+        <Router basename="/hub/">
           <div>
             <nav className="navbar navbar-dark bg-primary">
               <Link to="/" className="navbar-brand">

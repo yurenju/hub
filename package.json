@@ -10,6 +10,7 @@
     "chai": "^4.1.2",
     "dotenv": "^6.0.0",
     "ganache-cli": "^6.1.0",
+    "gh-pages": "^1.2.0",
     "moment": "^2.22.2",
     "openzeppelin-solidity": "1.11.0",
     "qrcode": "^1.2.2",
@@ -25,6 +26,8 @@
     "web3": "^1.0.0-beta.34"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
@@ -35,6 +38,7 @@
     "postcontract:compile": "mkdir -p src/contracts && cp ethereum/build/contracts/*.json src/contracts",
     "contract:deploy": "cd ethereum && truffle migrate --network rinkeby --reset"
   },
+  "homepage": "https://yurenju.github.io/hub",
   "author": "Yuren Ju <yurenju@gmail.com>",
   "license": "MIT"
 }
