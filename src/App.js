@@ -5,6 +5,7 @@ import EventList from './EventList';
 import EventDetail from './EventDetail';
 import CreateEvent from './CreateEvent';
 import './App.css';
+import QRCode from './QRCode';
 
 class App extends Component {
   render() {
@@ -22,6 +23,7 @@ class App extends Component {
             </nav>
             <Route exact path="/" component={EventList} />
             <Route path="/new" component={CreateEvent} />
+            <Route path="/qrcode" component={QRCode} />
             <Route path="/events/:eventId" component={EventDetail} />
           </div>
         </Router>

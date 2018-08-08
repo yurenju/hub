@@ -79,7 +79,10 @@ class EventDetail extends Component {
       const accounts = await getAccounts();
       const message = `${this.state.tickets[0]}`;
       const signature = await sign(message, accounts[0]);
-      QRCode.toCanvas(this.canvasRef.current, signature, { scale: 4 });
+      const contract = this.props.match.params.eventId;
+      const ticketId = this.state.tickets[0];
+      const qrcodeContent = { contract, signature, ticketId };
+      QRCode.toCanvas(this.canvasRef.current, JSON.stringify(qrcodeContent), { scale: 4 });
     }
 
     this.setState({ showQRCode: !this.state.showQRCode });
