@@ -52,7 +52,7 @@ class Event extends Component {
     return (
       <div className={className}>
         <div>
-          <Link to={`/events/${this.props.id}`}>{this.props.title}</Link>
+          <Link to={`/events/${this.props.id}`}>{this.props.title || 'Untitled'}</Link>
         </div>
       </div>
     );

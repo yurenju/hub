@@ -28,21 +28,38 @@ class QRCode extends Component {
     console.error(err);
   };
 
+  renderText() {
+    if (this.state.success) {
+      return (
+        <div className="alert alert-primary" role="alert">
+          Verified
+        </div>
+      );
+    } else {
+      return (
+        <div className="alert alert-warning" role="alert">
+          Scanning
+        </div>
+      );
+    }
+  }
+
   render() {
     const previewStyle = {
-      height: 240,
-      width: 320
+      height: 320,
+      width: 320,
+      margin: 'auto'
     };
 
     return (
-      <div>
+      <div className="text-center">
         <QrReader
           delay={this.state.delay}
           style={previewStyle}
           onError={this.handleError}
           onScan={this.handleScan}
         />
-        <p>{this.state.success ? 'Verified' : 'Scanning'}</p>
+        {this.renderText()}
       </div>
     );
   }
