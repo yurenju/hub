@@ -13,7 +13,7 @@ contract TicketSale is ERC721Token {
 
   uint256 public tickets = 0;
   uint256 public price;
-  uint32 public limit = 1;
+  uint8 public limit = 1;
   uint256 public maxAttendees = 10;
   uint16 public tradeFee = 0;
   uint8 public maxMarkedTickets = 10;
@@ -77,7 +77,7 @@ contract TicketSale is ERC721Token {
     hosts[host] = true;
   }
 
-  function setLimit(uint32 _limit) onlyHost external {
+  function setLimit(uint8 _limit) onlyHost external {
     limit = _limit;
   }
 
