@@ -1,9 +1,14 @@
 pragma solidity ^0.4.24;
 
 import "openzeppelin-solidity/contracts/token/ERC721/ERC721Token.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./Hub.sol";
 
 contract TicketSale is ERC721Token {
+  using SafeMath for uint8;
+  using SafeMath for uint16;
+  using SafeMath for uint256;
+
   Hub hub;
   mapping(address => bool) public hosts;
   uint256 public tradings = 0;
@@ -48,8 +53,8 @@ contract TicketSale is ERC721Token {
   }
 
   function register(uint8 ticketAmount) external payable {
-    require(msg.value >= price * ticketAmount, "not enough value");
-    require(balanceOf(msg.sender) + ticketAmount <= limit, "too many ticket amount");
+    require(msg.value >= price.mul(ticketAmount), "not enough value");
+    require(balanceOf(msg.sender).add(ticketAmount) <= limit, "too many ticket amount");
     require(tickets < maxAttendees, "register is ended");
 
     if (startTime != 0) {
@@ -59,13 +64,13 @@ contract TicketSale is ERC721Token {
       require(now <= dueTime, "ticket sale is ended");
     }
 
-    serviceFee += msg.value * serviceFeeRatio / 10000;
-    for (uint index = 0; index < ticketAmount; index++) {
+    serviceFee = serviceFee.add(msg.value.mul(serviceFeeRatio).div(10000));
+    for (uint256 index = 0; index < ticketAmount; index++) {
       tickets++;
       _mint(msg.sender, tickets);
     }
 
-    uint256 rest = msg.value - (ticketAmount * price);
+    uint256 rest = msg.value.sub(ticketAmount.mul(price));
     if (rest > 0) {
       msg.sender.transfer(rest);
     }
@@ -134,7 +139,7 @@ contract TicketSale is ERC721Token {
 
   function withdraw() external onlyHost {
     // BUGGY HERE
-    msg.sender.transfer(address(this).balance - serviceFee);
+    msg.sender.transfer(address(this).balance.sub(serviceFee));
   }
 
   function withdrawFee() external {
