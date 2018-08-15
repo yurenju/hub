@@ -43,18 +43,20 @@ contract TicketSale is ERC721Token {
   }
 
   modifier onlyHost() {
-    require(hosts[msg.sender] == true);
+    require(hosts[msg.sender] == true, "only host can access it");
     _;
   }
 
   function register(uint8 ticketAmount) external payable {
-    require(msg.value >= price * ticketAmount && balanceOf(msg.sender) + ticketAmount <= limit && tickets < maxAttendees);
+    require(msg.value >= price * ticketAmount, "not enough value");
+    require(balanceOf(msg.sender) + ticketAmount <= limit, "too many ticket amount");
+    require(tickets < maxAttendees, "register is ended");
 
     if (startTime != 0) {
-      require(now >= startTime);
+      require(now >= startTime, "ticket sale is not started yet");
     }
     if (dueTime != 0) {
-      require(now <= dueTime);
+      require(now <= dueTime, "ticket sale is ended");
     }
 
     serviceFee += msg.value * serviceFeeRatio / 10000;
@@ -73,19 +75,19 @@ contract TicketSale is ERC721Token {
     maxAttendees = _maxAttendees;
   }
 
-  function setHost(address host) onlyHost external {
+  function setHost(address host) external onlyHost {
     hosts[host] = true;
   }
 
-  function setLimit(uint8 _limit) onlyHost external {
+  function setLimit(uint8 _limit) external  onlyHost {
     limit = _limit;
   }
 
-  function setPrice(uint256 _price) onlyHost external {
+  function setPrice(uint256 _price) external  onlyHost {
     price = _price;
   }
 
-  function setTradeFee(uint16 _fee) onlyHost external {
+  function setTradeFee(uint16 _fee) external  onlyHost {
     tradeFee = _fee;
   }
 
@@ -103,23 +105,23 @@ contract TicketSale is ERC721Token {
 
   function cancelTrade(uint256 tradeId) external {
     Trade memory t = tradingList[tradeId];
-    require(t.owner == msg.sender);
+    require(t.owner == msg.sender, "only owner can cancel trading");
     _cancelTrade(tradeId, msg.sender);
   }
 
   function trade(uint256 tradeId) public payable {
-    require(tradingList[tradeId].ticketId != 0);
+    require(tradingList[tradeId].ticketId != 0, "");
 
     Trade memory t = tradingList[tradeId];
-    require(t.value <= msg.value);
+    require(t.value <= msg.value, "ticket price is nout enough");
 
     _cancelTrade(t.ticketId, t.owner);
     removeTokenFrom(t.owner, t.ticketId);
     addTokenTo(msg.sender, t.ticketId);
   }
 
-  function setUsedTickets(uint256[] ticketIds) onlyHost external {
-    require(ticketIds.length <= maxMarkedTickets);
+  function setUsedTickets(uint256[] ticketIds) external onlyHost {
+    require(ticketIds.length <= maxMarkedTickets, "set too many tickets in the same time");
 
     for (uint8 index = 0; index < ticketIds.length; index++) {
       usedTickets[ticketIds[index]] = true;
@@ -136,7 +138,9 @@ contract TicketSale is ERC721Token {
   }
 
   function withdrawFee() external {
-    require(address(hub) != address(0) && serviceFee > 0 && serviceFee <= address(this).balance);
+    require(address(hub) != address(0), "hub contract does not exist");
+    require(serviceFee > 0, "service fee is not required");
+    require(serviceFee <= address(this).balance, "balance is not enough");
 
     hub.deposite.value(serviceFee)();
     serviceFee = 0;

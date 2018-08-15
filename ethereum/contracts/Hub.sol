@@ -13,15 +13,15 @@ contract Hub {
   }
 
   modifier onlyAdmin() {
-    require(admins[msg.sender] == true);
+    require(admins[msg.sender] == true, "only admin can access it");
     _;
   }
 
-  function isAdmin() view external returns (bool) {
+  function isAdmin() external view returns (bool) {
     return admins[msg.sender];
   }
 
-  function setFeeRate(uint16 rate) onlyAdmin external {
+  function setFeeRate(uint16 rate) external onlyAdmin {
     serviceFeeRate = rate;
   }
 
@@ -32,15 +32,15 @@ contract Hub {
     eventList[events] = ts;
   }
 
-  function withdraw() onlyAdmin external {
+  function withdraw() external onlyAdmin {
     msg.sender.transfer(address(this).balance);
   }
 
-  function getBalance() view external returns (uint256) {
+  function getBalance() external view returns (uint256) {
     return address(this).balance;
   }
 
-  function() payable external {}
+  function() external payable {}
 
   function deposite() external payable {}
 }
