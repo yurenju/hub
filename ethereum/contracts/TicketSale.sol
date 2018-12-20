@@ -55,7 +55,7 @@ contract TicketSale is ERC721Token {
   function register(uint8 ticketAmount) external payable {
     require(msg.value >= price.mul(ticketAmount), "not enough value");
     require(balanceOf(msg.sender).add(ticketAmount) <= limit, "too many ticket amount");
-    require(tickets < maxAttendees, "register is ended");
+    require(tickets.add(ticketAmount) <= maxAttendees, "too many ticket register");
 
     if (startTime != 0) {
       require(now >= startTime, "ticket sale is not started yet");
@@ -75,8 +75,9 @@ contract TicketSale is ERC721Token {
       msg.sender.transfer(rest);
     }
   }
-
-  function setMaxAttendees(uint256 _maxAttendees) external {
+  
+  function setMaxAttendees(uint256 _maxAttendees) external onlyHost {
+    require(_maxAttendees > maxAttendees, "maxAttendees must be greater than original");
     maxAttendees = _maxAttendees;
   }
 
@@ -84,11 +85,17 @@ contract TicketSale is ERC721Token {
     hosts[host] = true;
   }
 
-  function setLimit(uint8 _limit) external  onlyHost {
+  function removeHost(address addr) external onlyHost {
+    require(hosts[addr] == true, "only host can be remove");
+    hosts[addr] = false;
+  }
+
+  function setLimit(uint8 _limit) external onlyHost {
+    require(_limit > limit, "limit must be greater than original");
     limit = _limit;
   }
 
-  function setPrice(uint256 _price) external  onlyHost {
+  function setPrice(uint256 _price) external onlyHost {
     price = _price;
   }
 
@@ -96,45 +103,54 @@ contract TicketSale is ERC721Token {
     tradeFee = _fee;
   }
 
-  function requestTrading(uint256 ticketId, uint256 value) external {
+  function requestTrading(uint256 _ticketId, uint256 _value) external {
+    address owner = ownerOf(_ticketId);
+    require(msg.sender == owner || isApprovedForAll(owner, msg.sender), "only owner can sell");
     tradings++;
-    tradingList[tradings] = Trade({ticketId: ticketId, value: value, owner: msg.sender});
+    tradingList[tradings] = Trade({ticketId: _ticketId, value: _value, owner: msg.sender});
     tradingTicketsOfOwner[msg.sender]++;
   }
 
-  function _cancelTrade(uint256 tradeId, address owner) internal {
-    tradingTicketsOfOwner[owner]--;
-    delete tradingList[tradeId];
+  function _cancelTrade(uint256 _tradeId, address _owner) internal {
+    tradingTicketsOfOwner[_owner]--;
+    delete tradingList[_tradeId];
     tradings--;
   }
 
-  function cancelTrade(uint256 tradeId) external {
-    Trade memory t = tradingList[tradeId];
+  function cancelTrade(uint256 _tradeId) external {
+    Trade memory t = tradingList[_tradeId];
     require(t.owner == msg.sender, "only owner can cancel trading");
-    _cancelTrade(tradeId, msg.sender);
+    _cancelTrade(_tradeId, msg.sender);
   }
 
-  function trade(uint256 tradeId) public payable {
-    require(tradingList[tradeId].ticketId != 0, "");
+  function trade(uint256 _tradeId) public payable {
+    require(tradingList[_tradeId].ticketId != 0, "");
 
-    Trade memory t = tradingList[tradeId];
-    require(t.value <= msg.value, "ticket price is nout enough");
+    Trade memory t = tradingList[_tradeId];
+    require(t.value <= msg.value, "ticket price is not enough");
+
+    t.owner.transfer(t.value - tradeFee);
+    serviceFee = serviceFee.add(tradeFee);
+    uint256 rest = msg.value.sub(t.value);
+    if (rest > 0) {
+      msg.sender.transfer(rest);
+    }
 
     _cancelTrade(t.ticketId, t.owner);
     removeTokenFrom(t.owner, t.ticketId);
     addTokenTo(msg.sender, t.ticketId);
   }
 
-  function setUsedTickets(uint256[] ticketIds) external onlyHost {
-    require(ticketIds.length <= maxMarkedTickets, "set too many tickets in the same time");
+  function setUsedTickets(uint256[] _ticketIds) external onlyHost {
+    require(_ticketIds.length <= maxMarkedTickets, "set too many tickets in the same time");
 
-    for (uint8 index = 0; index < ticketIds.length; index++) {
-      usedTickets[ticketIds[index]] = true;
+    for (uint8 index = 0; index < _ticketIds.length; index++) {
+      usedTickets[_ticketIds[index]] = true;
     }
   }
 
-  function isUsedTicket(uint256 ticketId) external view returns (bool) {
-    return usedTickets[ticketId];
+  function isUsedTicket(uint256 _ticketId) external view returns (bool) {
+    return usedTickets[_ticketId];
   }
 
   function withdraw() external onlyHost {
@@ -147,7 +163,7 @@ contract TicketSale is ERC721Token {
     require(serviceFee > 0, "service fee is not required");
     require(serviceFee <= address(this).balance, "balance is not enough");
 
-    hub.deposite.value(serviceFee)();
+    hub.deposit.value(serviceFee)();
     serviceFee = 0;
   }
 }

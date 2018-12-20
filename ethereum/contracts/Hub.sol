@@ -42,5 +42,5 @@ contract Hub {
 
   function() external payable {}
 
-  function deposite() external payable {}
+  function deposit() external payable {}
 }
